@@ -7,9 +7,10 @@ import {
   StyledInput,
 } from './StyledComponents/Form.styled';
 
-function ContactForm({ contacts, addContact }) {
+function ContactForm({ contacts, handleAddContact }) {
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
   const handleChange = evt => {
     const { name, value } = evt.target;
     switch (name) {
@@ -36,7 +37,7 @@ function ContactForm({ contacts, addContact }) {
 
       return;
     }
-    addContact(name, number);
+    handleAddContact(name, number);
     reset();
   };
 
@@ -79,7 +80,7 @@ function ContactForm({ contacts, addContact }) {
 }
 
 ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
+  handleAddContact: PropTypes.func.isRequired,
   contacts: PropTypes.arrayOf(
     PropTypes.shape({
       id: PropTypes.string.isRequired,

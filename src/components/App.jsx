@@ -1,36 +1,22 @@
 import { nanoid } from 'nanoid';
+import { useSelector } from 'react-redux';
 import ContactForm from './Form';
 import ContactsList from './ContactsList';
+import { getContacts, getFilter } from 'redux/selectors';
 import Filter from './Filter';
 import {
   Container,
   Title,
   SecondaryTitle,
 } from './StyledComponents/App.styled';
-import { useState, useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { addContact, deleteContact } from 'redux/contactsSlice';
+import { setFilter } from 'redux/filterSlice';
 
 export function App() {
-  const [contacts, setContacts] = useState([]);
-  const [filter, setFilter] = useState('');
-
-  useEffect(() => {
-    try {
-      const savedContacts = localStorage.getItem('contacts');
-      const parsedContacts = JSON.parse(savedContacts) ?? [
-        { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-        { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-        { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-        { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-      ];
-      setContacts(parsedContacts);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const contacts = useSelector(getContacts);
+  const filter = useSelector(getFilter);
+  const dispatch = useDispatch();
 
   const handleAddContact = (name, number) => {
     const newContact = {
@@ -38,29 +24,27 @@ export function App() {
       name: name.trim(),
       number: number.trim(),
     };
-    setContacts(prevState => [...prevState, newContact]);
+    dispatch(addContact(newContact));
   };
+
   const handleChangeFilter = event => {
-    setFilter(event.currentTarget.value);
+    dispatch(setFilter(event.currentTarget.value));
   };
+
   const handleClickDeleteButton = event => {
     const { value } = event.currentTarget;
-    const withoutdeletedContact = contacts.filter(
-      contact => contact.id !== value
-    );
-    setContacts(withoutdeletedContact);
+    dispatch(deleteContact(value));
   };
 
   const normalizedFilterName = filter.toLowerCase();
   const filteredContacts = contacts.filter(contact =>
     contact.name.toLowerCase().includes(normalizedFilterName)
   );
-
   return (
     <Container>
       <Title>Phonebook</Title>
 
-      <ContactForm addContact={handleAddContact} contacts={contacts} />
+      <ContactForm handleAddContact={handleAddContact} contacts={contacts} />
       <SecondaryTitle>Contacts</SecondaryTitle>
       <Filter filter={filter} changeFilter={handleChangeFilter} />
 
