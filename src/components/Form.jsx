@@ -1,15 +1,31 @@
 import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { nanoid } from '@reduxjs/toolkit';
 import {
   FormWrapper,
   StyledForm,
   StyledButton,
   StyledInput,
 } from './StyledComponents/Form.styled';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
 
-function ContactForm({ contacts, handleAddContact }) {
+function ContactForm() {
+  const contacts = useSelector(getContacts);
+  const dispatch = useDispatch();
+
   const [name, setName] = useState('');
   const [number, setNumber] = useState('');
+
+  const handleAddContact = (name, number) => {
+    const newContact = {
+      id: nanoid(),
+      name: name.trim(),
+      number: number.trim(),
+    };
+    dispatch(addContact(newContact));
+  };
 
   const handleChange = evt => {
     const { name, value } = evt.target;
@@ -78,16 +94,5 @@ function ContactForm({ contacts, handleAddContact }) {
     </FormWrapper>
   );
 }
-
-ContactForm.propTypes = {
-  handleAddContact: PropTypes.func.isRequired,
-  contacts: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      name: PropTypes.string.isRequired,
-      number: PropTypes.string.isRequired,
-    })
-  ).isRequired,
-};
 
 export default ContactForm;
